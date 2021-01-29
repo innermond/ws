@@ -9,8 +9,17 @@ const sel = document.getSelection();
 const commaSpaceBefore = /\s+,/mg;
 const commaNoSpaceAfter = /,[^\s\n]/mg;
 const commaNoSpaceAfterAllowDigit = /,[^\s\n\d]/mg;
+const paranthesisWithSpace = /[\(\[]\s+|\s+[\)\]]/mg;
+const exclamationQuestionWithSpaces = /\s+[\?\!]/mg;
+const exclamationQuestionMoreThanTwo = /[\?\!]{3,}/mg;
+const pointSeparated = /\s+\./mg;
+const pointWithLetter = /\.[a-zA-ZîÎăĂâÂșȘțȚ]/g;
+const pointSpacedAtEnd = /\.\s+\n/mg;
+const pointDecimalMustBeComma = /(?<=\d)\.(?=\d)/g;
+const quotationMarkStraight = /"/g;
+const quotationMarkSimulated = /,{2,}/g;
 const rx = [];
-rx.push(commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit);
+rx.push(commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit, paranthesisWithSpace, exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo, pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma, quotationMarkStraight, quotationMarkSimulated);
 // detect pain spots
 function spots(txt, rx) {
     //TODO handle null cases
@@ -59,7 +68,6 @@ const make_mistakes_one_by_one = (ff) => {
 function scrollhighlight(dir = 'next') {
     if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0)
         return;
-    console.log(mistakes_one_by_one.len(), mistakes_one_by_one.curr);
     const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
     if (found === undefined)
         return;

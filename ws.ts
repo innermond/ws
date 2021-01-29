@@ -10,8 +10,28 @@ const sel: Selection | null = document.getSelection();
 const commaSpaceBefore: RegExp = /\s+,/mg;
 const commaNoSpaceAfter: RegExp = /,[^\s\n]/mg;
 const commaNoSpaceAfterAllowDigit: RegExp = /,[^\s\n\d]/mg;
+
+const paranthesisWithSpace: RegExp = /[\(\[]\s+|\s+[\)\]]/mg;
+
+const exclamationQuestionWithSpaces: RegExp = /\s+[\?\!]/mg;
+const exclamationQuestionMoreThanTwo: RegExp = /[\?\!]{3,}/mg;
+
+const pointSeparated: RegExp = /\s+\./mg;
+const pointWithLetter: RegExp = /\.[a-zA-ZîÎăĂâÂșȘțȚ]/g;
+const pointSpacedAtEnd: RegExp = /\.\s+\n/mg;
+const pointDecimalMustBeComma: RegExp = /(?<=\d)\.(?=\d)/g;
+
+const quotationMarkStraight: RegExp = /"/g;
+const quotationMarkSimulated: RegExp = /,{2,}/g;
+
 const rx: Array<RegExp> = [];
-rx.push(commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit);
+rx.push(
+	commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit,
+	paranthesisWithSpace,
+	exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo,
+	pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma,
+	quotationMarkStraight, quotationMarkSimulated,
+);
 // detect pain spots
 function spots(txt: string | null, rx: RegExp): Array<RegExpExecArray> {
 //TODO handle null cases
@@ -60,7 +80,6 @@ const make_mistakes_one_by_one = (ff: Array<RegExpExecArray>) => {
 
 function scrollhighlight(dir='next') {
     if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0) return;
-		console.log(mistakes_one_by_one.len(), mistakes_one_by_one.curr);
 
     const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
     if (found === undefined) return;
