@@ -1,11 +1,12 @@
 // view
-const wiper = document.getElementById('wiper') as HTMLButtonElement;
+const info = document.getElementById('info') as HTMLDivElement;
+const rules = document.getElementById('rules') as HTMLSelectElement;
 const hairy = document.getElementById('hairy') as HTMLTextAreaElement;
 const lightnext = document.getElementById('lightnext') as HTMLButtonElement;
 const lightprev = document.getElementById('lightprev') as HTMLButtonElement;
 
 const sel: Selection | null = document.getSelection();
-// engine
+
 // detect pain spots
 function spots(txt: string | null): Array<RegExpExecArray> {
 //TODO handle null cases
@@ -50,20 +51,24 @@ const make_mistakes_one_by_one = (ff: Array<RegExpExecArray>) => {
         if (this.curr <= -1) this.curr = this.ff.length -1;
         return this.ff[this.curr];
     },    
+    len() {
+        return this.ff.length;
+    },
 })};
 
 function scrollhighlight(dir='next') {
-    if (mistakes_one_by_one.length === 0) return;
+    if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0) return;
 
     const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
     if (found === undefined) return;
     if (hairy === null) return;
 
+    hairy.focus();
+    sel?.removeAllRanges();
+    hairy.scrollTop = 0;
     const fulltext = hairy.value;
     const indexend = found.index + found[0].length;
     // the trick
-    hairy.focus();
-    sel?.removeAllRanges();
     hairy.value = fulltext.substring(0, indexend);
     const scrollTop = hairy.scrollHeight;
     hairy.scrollTop = scrollTop;
@@ -72,12 +77,17 @@ function scrollhighlight(dir='next') {
     hairy.setSelectionRange(found.index, indexend);
 }
 
-wiper.addEventListener('click', (evt) => {
-    evt.preventDefault();
+function runtext() {
     const sel = document.getSelection();
     if (sel === null) return;
     sel.removeAllRanges();
     make_mistakes_one_by_one(spots(hairy.value));
+} 
+
+rules.addEventListener('change', (evt) => {
+    evt.preventDefault();
+    if (rules.value === '0') return;
+    runtext();
 });
 
 lightnext.addEventListener('click', (evt) => {
@@ -91,30 +101,7 @@ lightprev.addEventListener('click', (evt) => {
 });
 
 hairy.spellcheck = false;
-hairy.value = ` Cum m-am vindecat de cancer prin metoda Detox Nutri Fit      !!!!!!!( sa apara pe toate paginile cartii cu acest font nu Arial)  
-
-                              
-                          
-
-   
-                  Capitolul  4 
-                  Onco-Fitoterapia
-
-
-
-  Cum ne facem ,propriul protocol   ,  anticancer dup,ă ce am terminat chimioterapia  (titlu!!!)
-
-După ce am terminat, chimioterapia , nu trebuie să ne considerăm vindecați. Ca și pe parcursul celorlalte etape anterioare, nutriția reprezintă un factor extrem de important, dar acum devine deja un factor de vindecare.
-   ,   ,
-Celulele tumorale sunt slăbite, sunt deja înfometate, pentru că ați avut o nutriție fără carne, zahăr și lactate, iar în acest moment, orice poftă alimentară, indiferent că este vorba de o simplă linguriță din produsele interzise, va fi direct hrană pentru celulele tumorale. Nu trebuie să lăsăm nici o ușă deschisă cancerului.
-
-Într-o singură , zi puteți da înapoi progresele,făcute în,. ultimele 6 luni sau chiar în ultimele 12 luni.
-
-Acum este nevoie de minimum 3-5 mese zilnic, cu minimum 100.000 de unități ORAC, polenul crud se va lua totdeauna după masă, dar nu seara, deoarece vă va oferi o senzație de sațietate.
-
-Dintre suplimentele de chimioterapie vegetală de la punc,tul 2,000  sau 3,din acest modul vor fi folosite minimum 4-5 plante în mod concomitent, iar acestea vor fi rulate la o perioadă de 60 de zile cu alte 4-5 suplimente din listă.
-
-Graviola și năpraznicul vor rămâne constante până la vindecarea pacientului. Luați zilnic suplimente cu melatonină, 10-30 mg seara, cu 30 de minute înainte de culcare. Dacă observați somnolență pe perioada zilei, reduceți doza la 10 mg.
-Luați probiotice și polen crud de trandafir sălbatic Apiland pentru refacerea florei intestinale după chimioterapie.
-Luați extracte de ienupăr, brusture sau echinaceea pentru a elimina substanțele toxice din s ,istemul limfatic. 
-`;
+hairy.addEventListener('change', () => {
+    if (rules.value === '0') return;
+   runtext(); 
+});

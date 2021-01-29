@@ -1,12 +1,19 @@
 <!doctype html>
 <html>
   <head>
-    <title>Înălbitor de texte neepilate</title>
+    <title>Verifică erorile de text</title>
   </head>
   <body>
-<h3>Text neepilat</h3>
-    <textarea id="hairy"></textarea>
-    <button id="wiper">Caută</button>
+<h3>Text brut</h3>
+    <textarea id="hairy" style="overflow-x: hidden; padding: 1rem;"></textarea>
+    <div id="info"></div>
+    <select id="rules">
+        <option value="0">alegeți tipul de verificare</option>
+        <optgroup label="Erori de virgulă">
+            <option value="1">spațiu înainte de virgulă</option>
+            <option value="2">lipsă spațiu după virgulă</option>
+        </optgroup>
+    </select>
     <button id="lightprev"><<</button>
     <button id="lightnext">>></button>
     <script src="./ws.js"></script>
