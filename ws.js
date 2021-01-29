@@ -1,14 +1,15 @@
+"use strict";
 // view
-var info = document.getElementById('info');
-var rules = document.getElementById('rules');
-var hairy = document.getElementById('hairy');
-var lightnext = document.getElementById('lightnext');
-var lightprev = document.getElementById('lightprev');
-var sel = document.getSelection();
-var commaSpaceBefore = /\s+,/mg;
-var commaNoSpaceAfter = /,[^\s\n]/mg;
-var commaNoSpaceAfterAllowDigit = /,[^\s\n\d]/mg;
-var rx = [];
+const info = document.getElementById('info');
+const rules = document.getElementById('rules');
+const hairy = document.getElementById('hairy');
+const lightnext = document.getElementById('lightnext');
+const lightprev = document.getElementById('lightprev');
+const sel = document.getSelection();
+const commaSpaceBefore = /\s+,/mg;
+const commaNoSpaceAfter = /,[^\s\n]/mg;
+const commaNoSpaceAfterAllowDigit = /,[^\s\n\d]/mg;
+const rx = [];
 rx.push(commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit);
 // detect pain spots
 function spots(txt, rx) {
@@ -18,93 +19,95 @@ function spots(txt, rx) {
     if (sel === null)
         return [];
     sel.removeAllRanges();
-    var ff = [];
-    ff.push.apply(ff, mistakes(rx, txt).filter(function (x) { return x.length; }));
+    const ff = [];
+    ff.push(...mistakes(rx, txt).filter(x => x.length));
     return ff;
 }
 function mistakes(rx, txt) {
     if (hairy.firstChild === null)
         [];
-    var ff = [];
-    var found;
+    let ff = [];
+    let found;
     while ((found = rx.exec(txt)) != null) {
         ff.push(found);
     }
     return ff;
 }
 //TODO asign a type
-var mistakes_one_by_one;
-var make_mistakes_one_by_one = function (ff) {
+let mistakes_one_by_one;
+const make_mistakes_one_by_one = (ff) => {
     mistakes_one_by_one = ({
         curr: -1,
-        ff: ff,
-        next: function () {
+        ff,
+        next() {
             this.curr++;
             if (this.curr >= this.ff.length)
                 this.curr = 0;
             return this.ff[this.curr];
         },
-        prev: function () {
+        prev() {
             this.curr--;
             if (this.curr <= -1)
                 this.curr = this.ff.length - 1;
             return this.ff[this.curr];
         },
-        len: function () {
+        len() {
             return this.ff.length;
-        }
+        },
     });
 };
-function scrollhighlight(dir) {
-    if (dir === void 0) { dir = 'next'; }
+function scrollhighlight(dir = 'next') {
     if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0)
         return;
-    var found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
+    console.log(mistakes_one_by_one.len(), mistakes_one_by_one.curr);
+    const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
     if (found === undefined)
         return;
     if (hairy === null)
         return;
+    info.textContent = `s-au găsit ${mistakes_one_by_one.len()} erori - te afli la #${mistakes_one_by_one.curr + 1}`;
     hairy.focus();
     sel === null || sel === void 0 ? void 0 : sel.removeAllRanges();
     hairy.scrollTop = 0;
-    var fulltext = hairy.value;
-    var indexend = found.index + found[0].length;
+    const fulltext = hairy.value;
+    const indexend = found.index + found[0].length;
     // the trick
     hairy.value = fulltext.substring(0, indexend);
-    var scrollTop = hairy.scrollHeight;
+    const scrollTop = hairy.scrollHeight;
     hairy.scrollTop = scrollTop;
     hairy.value = fulltext;
     hairy.setSelectionRange(found.index, indexend);
 }
 function runtext() {
     var _a;
-    var sel = document.getSelection();
+    const sel = document.getSelection();
     if (sel === null)
         return;
     sel.removeAllRanges();
-    var rx_key = (_a = parseInt(rules.value)) !== null && _a !== void 0 ? _a : -1;
+    const rx_key = (_a = parseInt(rules.value)) !== null && _a !== void 0 ? _a : -1;
     if (rx_key === -1)
         return;
     if (!(rx_key in rx))
         return;
     make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
+    info.textContent = `s-au găsit ${mistakes_one_by_one.len()} erori`;
 }
-rules.addEventListener('change', function (evt) {
+rules.addEventListener('change', (evt) => {
     evt.preventDefault();
     if (rules.value === '-1')
         return;
     runtext();
 });
-lightnext.addEventListener('click', function (evt) {
+lightnext.addEventListener('click', (evt) => {
     evt.preventDefault();
     scrollhighlight('next');
 });
-lightprev.addEventListener('click', function (evt) {
+lightprev.addEventListener('click', (evt) => {
     evt.preventDefault();
     scrollhighlight('prev');
 });
 hairy.spellcheck = false;
-hairy.addEventListener('change', function () {
+hairy.addEventListener('change', () => {
     if (rules.value === '-1')
         return;
     runtext();

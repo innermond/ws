@@ -60,10 +60,13 @@ const make_mistakes_one_by_one = (ff: Array<RegExpExecArray>) => {
 
 function scrollhighlight(dir='next') {
     if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0) return;
+		console.log(mistakes_one_by_one.len(), mistakes_one_by_one.curr);
 
     const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
     if (found === undefined) return;
     if (hairy === null) return;
+		
+		info.textContent = `s-au găsit ${mistakes_one_by_one.len()} erori - te afli la #${mistakes_one_by_one.curr + 1}`;
 
     hairy.focus();
     sel?.removeAllRanges();
@@ -87,6 +90,7 @@ function runtext() {
     if (rx_key === -1) return;
     if (!(rx_key in rx)) return;
     make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
+		info.textContent = `s-au găsit ${mistakes_one_by_one.len()} erori`;
 } 
 
 rules.addEventListener('change', (evt) => {

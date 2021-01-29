@@ -1,0 +1,27 @@
+{
+  "name": "ws",
+  "version": "1.0.0",
+  "description": "textarea found",
+  "main": "ws.js",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/innermond/ws.git"
+  },
+  "keywords": [
+    "texyarea",
+    "find"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/innermond/ws/issues"
+  },
+  "homepage": "https://github.com/innermond/ws#readme"
+}
