@@ -5,8 +5,13 @@ var hairy = document.getElementById('hairy');
 var lightnext = document.getElementById('lightnext');
 var lightprev = document.getElementById('lightprev');
 var sel = document.getSelection();
+var commaSpaceBefore = /\s+,/mg;
+var commaNoSpaceAfter = /,[^\s\n]/mg;
+var commaNoSpaceAfterAllowDigit = /,[^\s\n\d]/mg;
+var rx = [];
+rx.push(commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit);
 // detect pain spots
-function spots(txt) {
+function spots(txt, rx) {
     //TODO handle null cases
     if (txt === null)
         return [];
@@ -14,10 +19,7 @@ function spots(txt) {
         return [];
     sel.removeAllRanges();
     var ff = [];
-    var commaSpaceBefore = /\s+,/mg;
-    ff.push.apply(ff, mistakes(commaSpaceBefore, txt).filter(function (x) { return x.length; }));
-    var commaNoSpaceAfter = /[^\s\n],[^\s\n]/mg;
-    ff.push.apply(ff, mistakes(commaNoSpaceAfter, txt).filter(function (x) { return x.length; }));
+    ff.push.apply(ff, mistakes(rx, txt).filter(function (x) { return x.length; }));
     return ff;
 }
 function mistakes(rx, txt) {
@@ -75,15 +77,21 @@ function scrollhighlight(dir) {
     hairy.setSelectionRange(found.index, indexend);
 }
 function runtext() {
+    var _a;
     var sel = document.getSelection();
     if (sel === null)
         return;
     sel.removeAllRanges();
-    make_mistakes_one_by_one(spots(hairy.value));
+    var rx_key = (_a = parseInt(rules.value)) !== null && _a !== void 0 ? _a : -1;
+    if (rx_key === -1)
+        return;
+    if (!(rx_key in rx))
+        return;
+    make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
 }
 rules.addEventListener('change', function (evt) {
     evt.preventDefault();
-    if (rules.value === '0')
+    if (rules.value === '-1')
         return;
     runtext();
 });
@@ -97,7 +105,7 @@ lightprev.addEventListener('click', function (evt) {
 });
 hairy.spellcheck = false;
 hairy.addEventListener('change', function () {
-    if (rules.value === '0')
+    if (rules.value === '-1')
         return;
     runtext();
 });

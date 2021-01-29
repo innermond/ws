@@ -7,8 +7,13 @@ const lightprev = document.getElementById('lightprev') as HTMLButtonElement;
 
 const sel: Selection | null = document.getSelection();
 
+const commaSpaceBefore: RegExp = /\s+,/mg;
+const commaNoSpaceAfter: RegExp = /,[^\s\n]/mg;
+const commaNoSpaceAfterAllowDigit: RegExp = /,[^\s\n\d]/mg;
+const rx: Array<RegExp> = [];
+rx.push(commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit);
 // detect pain spots
-function spots(txt: string | null): Array<RegExpExecArray> {
+function spots(txt: string | null, rx: RegExp): Array<RegExpExecArray> {
 //TODO handle null cases
     if (txt === null) return [];
     if (sel === null) return [];
@@ -16,10 +21,7 @@ function spots(txt: string | null): Array<RegExpExecArray> {
     sel.removeAllRanges();
 
     const ff: Array<RegExpExecArray> = [];
-    const commaSpaceBefore: RegExp = /\s+,/mg;
-    ff.push(...mistakes(commaSpaceBefore, txt).filter(x => x.length));
-    const commaNoSpaceAfter: RegExp = /[^\s\n],[^\s\n]/mg;
-    ff.push(...mistakes(commaNoSpaceAfter, txt).filter(x => x.length));
+    ff.push(...mistakes(rx, txt).filter(x => x.length));
 
     return ff;
 }
@@ -81,12 +83,15 @@ function runtext() {
     const sel = document.getSelection();
     if (sel === null) return;
     sel.removeAllRanges();
-    make_mistakes_one_by_one(spots(hairy.value));
+    const rx_key: number = parseInt(rules.value) ?? -1;
+    if (rx_key === -1) return;
+    if (!(rx_key in rx)) return;
+    make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
 } 
 
 rules.addEventListener('change', (evt) => {
     evt.preventDefault();
-    if (rules.value === '0') return;
+    if (rules.value === '-1') return;
     runtext();
 });
 
@@ -102,6 +107,6 @@ lightprev.addEventListener('click', (evt) => {
 
 hairy.spellcheck = false;
 hairy.addEventListener('change', () => {
-    if (rules.value === '0') return;
+    if (rules.value === '-1') return;
    runtext(); 
 });
