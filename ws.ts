@@ -8,8 +8,8 @@ const lightprev = document.getElementById('lightprev') as HTMLButtonElement;
 const sel: Selection | null = document.getSelection();
 
 const commaSpaceBefore: RegExp = /\s+,/mg;
-const commaNoSpaceAfter: RegExp = /,[^\s\n]/mg;
-const commaNoSpaceAfterAllowDigit: RegExp = /,[^\s\n\d]/mg;
+const commaNoSpaceAfterNoDigit: RegExp = /,[^\s\n\d]|(?<=[^\d]),(?=\d)/mg;
+const commaSpaceBeforeInsideDigit: RegExp = /(?<=\d)\s+,(?=\d)/mg;
 
 const paranthesisWithSpace: RegExp = /[\(\[]\s+|\s+[\)\]]/mg;
 
@@ -20,17 +20,35 @@ const pointSeparated: RegExp = /\s+\./mg;
 const pointWithLetter: RegExp = /\.[a-zA-ZîÎăĂâÂșȘțȚ]/g;
 const pointSpacedAtEnd: RegExp = /\.\s+\n/mg;
 const pointDecimalMustBeComma: RegExp = /(?<=\d)\.(?=\d)/g;
+const pointDecimalSpacedInsideDigit: RegExp = /(?<=\d)\s+\.(?=\d)|(?<=\d)\.\s+(?=\d)|(?<=\d)\s+\.\s+(?=\d)/mg;
 
-const quotationMarkStraight: RegExp = /"/g;
+const twopointsSpacedBefore: RegExp = /\s+\:/g;
+const twopointsSpacedAfter: RegExp = /\:\s{2,}|\:\s+$/g;
+const twopointsNoSpace: RegExp = /(?<=[^\s])\:(?=[^\s])/g;
+
+const apostropheWithSpace: RegExp = /\s+\'\s+|\s+\'|\'\s+/g;
+const apostropheMultiple: RegExp = /\'{2,}/g;
+
+const quotationMarkStraight: RegExp = /"/mg;
 const quotationMarkSimulated: RegExp = /,{2,}/g;
+const quotationMarkBeginUpper: RegExp = /\u201C(?=[^\u201D]+\u201D)/mg;
+
+const spaceStartParagraph: RegExp = /^\s+/mg;
+const spaceEndParagraph: RegExp = /\s+$/mg;
+const spaceMultiple: RegExp = /[^\S\r\n]{2,}/g;
+const emptyParagraph: RegExp = /^\n/mg;
 
 const rx: Array<RegExp> = [];
+// order matters, it mirrors those existent on html source
 rx.push(
-	commaSpaceBefore, commaNoSpaceAfter, commaNoSpaceAfterAllowDigit,
+	commaSpaceBefore, commaNoSpaceAfterNoDigit, commaSpaceBeforeInsideDigit,
 	paranthesisWithSpace,
 	exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo,
-	pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma,
-	quotationMarkStraight, quotationMarkSimulated,
+	pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma,pointDecimalSpacedInsideDigit,
+	twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace,
+	apostropheWithSpace, apostropheMultiple,
+	quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper,
+	spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph,
 );
 // detect pain spots
 function spots(txt: string | null, rx: RegExp): Array<RegExpExecArray> {
