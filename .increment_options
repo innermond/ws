@@ -1,0 +1,4 @@
+#!/bin/bash
+
+gawk 'match($0, /(.+option value=")(-?[0-9]+)(.+)/, a) { if (a[2] != -1) print a[1] i++ a[3]; else print a[0];} !/.+option/ {print $0}' index.html > i.html
+mv i.html index.html
