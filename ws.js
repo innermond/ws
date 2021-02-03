@@ -5,8 +5,8 @@ var hairy = document.getElementById('hairy');
 var lightnext = document.getElementById('lightnext');
 var lightprev = document.getElementById('lightprev');
 var sel = document.getSelection();
-var commaSpaceBefore = /\s+,/mg;
-var commaNoSpaceAfterNoDigit = /,[^\s\n\d]|(?<=[^\d]),(?=\d)/mg;
+var commaSpaceBefore = /\s+(?=,)/mg;
+var commaNoSpaceAfterNoDigit = /,(?=[^\s\n\d])|(?<=[^\d]),(?=\d)/mg;
 var commaSpaceBeforeInsideDigit = /(?<=\d)\s+,(?=\d)/mg;
 var paranthesisWithSpace = /[\(\[]\s+|\s+[\)\]]/mg;
 var exclamationQuestionWithSpaces = /\s+[\?\!]/mg;
@@ -19,6 +19,11 @@ var pointDecimalSpacedInsideDigit = /(?<=\d)\s+\.(?=\d)|(?<=\d)\.\s+(?=\d)|(?<=\
 var twopointsSpacedBefore = /\s+\:/g;
 var twopointsSpacedAfter = /\:\s{2,}|\:\s+$/g;
 var twopointsNoSpace = /(?<=[^\s])\:(?=[^\s])/g;
+var suspensionSpaceBefore = /\s+(?=\.{3})/g;
+var suspensionSpaceAfterMissing = /(?<=\.{2})\.(?!\s)[^$]/g;
+var suspensionNumber = /(?<!\.)\.{2}(?!\.)|\.{4,}/g;
+var suspensionSpaceInside = /(?<=\.)\s+(?=\.)/g;
+var suspensionSpaceAfter = /(?<=[^\s]|^)(?<=\.{3})(\s+$|\s{2,}(?=[^$]))/g;
 var apostropheWithSpace = /\s+\'\s+|\s+\'|\'\s+/g;
 var apostropheMultiple = /\'{2,}/g;
 var quotationMarkStraight = /"/mg;
@@ -30,7 +35,7 @@ var spaceMultiple = /[^\S\r\n]{2,}/g;
 var emptyParagraph = /^\n/mg;
 var rx = [];
 // order matters, it mirrors those existent on html source
-rx.push(commaSpaceBefore, commaNoSpaceAfterNoDigit, commaSpaceBeforeInsideDigit, paranthesisWithSpace, exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo, pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma, pointDecimalSpacedInsideDigit, twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace, apostropheWithSpace, apostropheMultiple, quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper, spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph);
+rx.push(commaSpaceBefore, commaNoSpaceAfterNoDigit, commaSpaceBeforeInsideDigit, paranthesisWithSpace, exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo, pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma, pointDecimalSpacedInsideDigit, twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace, suspensionSpaceBefore, suspensionSpaceAfterMissing, suspensionNumber, suspensionSpaceInside, suspensionSpaceAfter, apostropheWithSpace, apostropheMultiple, quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper, spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph);
 // detect pain spots
 function spots(txt, rx) {
     //TODO handle null cases
