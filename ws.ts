@@ -102,9 +102,7 @@ function scrollhighlight(dir='next') {
     const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
     if (found === undefined) return;
     if (hairy === null) return;
-		
-		info.textContent = `s-au găsit ${mistakes_one_by_one.len()} erori - te afli la #${mistakes_one_by_one.curr + 1}`;
-
+    info.textContent = `${mistakes_one_by_one.len()} erori - te afli la #${mistakes_one_by_one.curr + 1}`;
     hairy.focus();
     sel?.removeAllRanges();
     hairy.scrollTop = 0;
@@ -119,21 +117,38 @@ function scrollhighlight(dir='next') {
     hairy.setSelectionRange(found.index, indexend);
 }
 
-function runtext() {
+function runtext(): number {
     const sel = document.getSelection();
-    if (sel === null) return;
+    if (sel === null) return 0;
     sel.removeAllRanges();
     const rx_key: number = parseInt(rules.value) ?? -1;
-    if (rx_key === -1) return;
-    if (!(rx_key in rx)) return;
+    if (rx_key === -1) return 0;
+    if (!(rx_key in rx)) return 0;
     make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
-		info.textContent = `s-au găsit ${mistakes_one_by_one.len()} erori`;
+    const num: number = mistakes_one_by_one.len();
+    info.textContent = `s-au găsit ${num} erori`;
+    return num;
 } 
+
+function usable (mode: boolean = true, inx: number = -1) { 
+    let xx: Array<HTMLButtonElement> = [lightprev, lightnext];
+    if (0 <= inx && inx < xx.length) {
+        xx = [xx[inx]];
+    } 
+    xx.forEach((el) => {
+        el.disabled = !mode;
+    });
+}
 
 rules.addEventListener('change', (evt) => {
     evt.preventDefault();
+    usable(false);
     if (rules.value === '-1') return;
-    runtext();
+    const found = runtext();
+    if (found > 0) {
+        usable(true);
+        lightnext.click();
+    } 
 });
 
 lightnext.addEventListener('click', (evt) => {
@@ -149,5 +164,10 @@ lightprev.addEventListener('click', (evt) => {
 hairy.spellcheck = false;
 hairy.addEventListener('change', () => {
     if (rules.value === '-1') return;
-   runtext(); 
+    usable(false);
+    const found = runtext();
+    if (found > 0) usable(true); 
 });
+
+
+usable(false);

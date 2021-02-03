@@ -1,4 +1,3 @@
-"use strict";
 // view
 var info = document.getElementById('info');
 var rules = document.getElementById('rules');
@@ -86,7 +85,7 @@ function scrollhighlight(dir) {
         return;
     if (hairy === null)
         return;
-    info.textContent = "s-au g\u0103sit " + mistakes_one_by_one.len() + " erori - te afli la #" + (mistakes_one_by_one.curr + 1);
+    info.textContent = mistakes_one_by_one.len() + " erori - te afli la #" + (mistakes_one_by_one.curr + 1);
     hairy.focus();
     sel === null || sel === void 0 ? void 0 : sel.removeAllRanges();
     hairy.scrollTop = 0;
@@ -103,21 +102,39 @@ function runtext() {
     var _a;
     var sel = document.getSelection();
     if (sel === null)
-        return;
+        return 0;
     sel.removeAllRanges();
     var rx_key = (_a = parseInt(rules.value)) !== null && _a !== void 0 ? _a : -1;
     if (rx_key === -1)
-        return;
+        return 0;
     if (!(rx_key in rx))
-        return;
+        return 0;
     make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
-    info.textContent = "s-au g\u0103sit " + mistakes_one_by_one.len() + " erori";
+    var num = mistakes_one_by_one.len();
+    info.textContent = "s-au g\u0103sit " + num + " erori";
+    return num;
+}
+function usable(mode, inx) {
+    if (mode === void 0) { mode = true; }
+    if (inx === void 0) { inx = -1; }
+    var xx = [lightprev, lightnext];
+    if (0 <= inx && inx < xx.length) {
+        xx = [xx[inx]];
+    }
+    xx.forEach(function (el) {
+        el.disabled = !mode;
+    });
 }
 rules.addEventListener('change', function (evt) {
     evt.preventDefault();
+    usable(false);
     if (rules.value === '-1')
         return;
-    runtext();
+    var found = runtext();
+    if (found > 0) {
+        usable(true);
+        lightnext.click();
+    }
 });
 lightnext.addEventListener('click', function (evt) {
     evt.preventDefault();
@@ -131,5 +148,9 @@ hairy.spellcheck = false;
 hairy.addEventListener('change', function () {
     if (rules.value === '-1')
         return;
-    runtext();
+    usable(false);
+    var found = runtext();
+    if (found > 0)
+        usable(true);
 });
+usable(false);
