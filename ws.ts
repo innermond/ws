@@ -7,6 +7,7 @@ const lightprev = document.getElementById('lightprev') as HTMLButtonElement;
 
 const sel: Selection | null = document.getSelection();
 
+//TODO check the need for min regex //mg
 const commaSpaceBefore: RegExp = /\s+(?=,)/mg;
 const commaNoSpaceAfterNoDigit: RegExp = /,(?=[^\s\n\d])|(?<=[^\d]),(?=\d)/mg;
 const commaSpaceBeforeInsideDigit: RegExp = /(?<=\d)\s+,(?=\d)/mg;
@@ -32,6 +33,11 @@ const suspensionNumber: RegExp = /(?<!\.)\.{2}(?!\.)|\.{4,}/g;
 const suspensionSpaceInside: RegExp = /(?<=\.)\s+(?=\.)/g;
 const suspensionSpaceAfter: RegExp =/(?<=[^\s]|^)(?<=\.{3})(\s+$|\s{2,}(?=[^$]))/g;
 
+const dialogSpaceBefore: RegExp = /^\s+(?=[\u002d\u2010\u2011\u2012\u2013\u2014\u2015])/mg;
+const dialogSpaceAfter: RegExp = /(?<=^\s*[\u002d\u2010\u2011\u2012\u2013\u2014\u2015])\s{2,}/mg;
+const dialogNoSpaceAfter: RegExp = /(?<=^\s*)[\u002d\u2010\u2011\u2012\u2013\u2014\u2015](?=\S)/mg;
+const dialogIllegalSign: RegExp = /(?<=^\s*)[\u002d\u2010\u2011\u2012\u2013\u2014]/mg;
+
 const apostropheWithSpace: RegExp = /\s+\'\s+|\s+\'|\'\s+/g;
 const apostropheMultiple: RegExp = /\'{2,}/g;
 
@@ -53,6 +59,7 @@ rx.push(
 	pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma,pointDecimalSpacedInsideDigit,
 	twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace,
 	suspensionSpaceBefore, suspensionSpaceAfterMissing, suspensionNumber, suspensionSpaceInside, suspensionSpaceAfter,
+    dialogSpaceBefore, dialogSpaceAfter, dialogNoSpaceAfter, dialogIllegalSign,
 	apostropheWithSpace, apostropheMultiple,
 	quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper,
 	spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph,
