@@ -6,17 +6,18 @@ var lightnext = document.getElementById('lightnext');
 var lightprev = document.getElementById('lightprev');
 var sel = document.getSelection();
 //TODO check the need for min regex //mg
-var commaSpaceBefore = /\s+(?=,)/mg;
-var commaNoSpaceAfterNoDigit = /,(?=[^\s\n\d])|(?<=[^\d]),(?=\d)/mg;
-var commaSpaceBeforeInsideDigit = /(?<=\d)\s+,(?=\d)/mg;
-var paranthesisWithSpace = /[\(\[]\s+|\s+[\)\]]/mg;
-var exclamationQuestionWithSpaces = /\s+[\?\!]/mg;
-var exclamationQuestionMoreThanTwo = /[\?\!]{3,}/mg;
-var pointSeparated = /\s+\./mg;
+var commaSpaceBefore = /\s+(?=,)/g;
+var commaNoSpaceAfterNoDigit = /,(?=[^\s\n\d])|(?<=[^\d]),(?=\d)/g;
+var commaSpaceBeforeInsideDigit = /(?<=\d)\s+,(?=\d)/g;
+var paranthesisSpaceInternal = /[\(\[]\s+|\s+[\)\]]/g;
+var paranthesisSpaceExternal = /(?<=\S)[\(\[]|[\)\]](?=[a-zA-Z0-9îÎăĂâÂșȘțȚ])/g;
+var exclamationQuestionWithSpaces = /\s+[\?\!]/g;
+var exclamationQuestionMoreThanTwo = /[\?\!]{3,}/g;
+var pointSeparated = /\s+\./g;
 var pointWithLetter = /\.[a-zA-ZîÎăĂâÂșȘțȚ]/g;
 var pointSpacedAtEnd = /\.\s+\n/mg;
 var pointDecimalMustBeComma = /(?<=\d)\.(?=\d)/g;
-var pointDecimalSpacedInsideDigit = /(?<=\d)\s+\.(?=\d)|(?<=\d)\.\s+(?=\d)|(?<=\d)\s+\.\s+(?=\d)/mg;
+var pointDecimalSpacedInsideDigit = /(?<=\d)\s+\.(?=\d)|(?<=\d)\.\s+(?=\d)|(?<=\d)\s+\.\s+(?=\d)/g;
 var twopointsSpacedBefore = /\s+\:/g;
 var twopointsSpacedAfter = /\:\s{2,}|\:\s+$/g;
 var twopointsNoSpace = /(?<=[^\s])\:(?=[^\s])/g;
@@ -25,22 +26,24 @@ var suspensionSpaceAfterMissing = /(?<=\.{2})\.(?!\s)[^$]/g;
 var suspensionNumber = /(?<!\.)\.{2}(?!\.)|\.{4,}/g;
 var suspensionSpaceInside = /(?<=\.)\s+(?=\.)/g;
 var suspensionSpaceAfter = /(?<=[^\s]|^)(?<=\.{3})(\s+$|\s{2,}(?=[^$]))/g;
+// here, multiline flag is needed
 var dialogSpaceBefore = /^\s+(?=[\u002d\u2010\u2011\u2012\u2013\u2014\u2015])/mg;
 var dialogSpaceAfter = /(?<=^\s*[\u002d\u2010\u2011\u2012\u2013\u2014\u2015])\s{2,}/mg;
 var dialogNoSpaceAfter = /(?<=^\s*)[\u002d\u2010\u2011\u2012\u2013\u2014\u2015](?=\S)/mg;
 var dialogIllegalSign = /(?<=^\s*)[\u002d\u2010\u2011\u2012\u2013\u2014]/mg;
+var obliqueBar = /\s+\/|\/\s+/g;
 var apostropheWithSpace = /\s+\'\s+|\s+\'|\'\s+/g;
 var apostropheMultiple = /\'{2,}/g;
-var quotationMarkStraight = /"/mg;
+var quotationMarkStraight = /"/g;
 var quotationMarkSimulated = /,{2,}/g;
-var quotationMarkBeginUpper = /\u201C(?=[^\u201D]+\u201D)/mg;
+var quotationMarkBeginUpper = /\u201C(?=[^\u201D]+\u201D)/g;
 var spaceStartParagraph = /^\s+/mg;
-var spaceEndParagraph = /\s+$/mg;
+var spaceEndParagraph = /(?<!\n)\s+$/mg;
 var spaceMultiple = /[^\S\r\n]{2,}/g;
 var emptyParagraph = /^\n/mg;
 var rx = [];
 // order matters, it mirrors those existent on html source
-rx.push(commaSpaceBefore, commaNoSpaceAfterNoDigit, commaSpaceBeforeInsideDigit, paranthesisWithSpace, exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo, pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma, pointDecimalSpacedInsideDigit, twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace, suspensionSpaceBefore, suspensionSpaceAfterMissing, suspensionNumber, suspensionSpaceInside, suspensionSpaceAfter, dialogSpaceBefore, dialogSpaceAfter, dialogNoSpaceAfter, dialogIllegalSign, apostropheWithSpace, apostropheMultiple, quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper, spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph);
+rx.push(commaSpaceBefore, commaNoSpaceAfterNoDigit, commaSpaceBeforeInsideDigit, paranthesisSpaceInternal, paranthesisSpaceExternal, exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo, pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma, pointDecimalSpacedInsideDigit, twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace, suspensionSpaceBefore, suspensionSpaceAfterMissing, suspensionNumber, suspensionSpaceInside, suspensionSpaceAfter, dialogSpaceBefore, dialogSpaceAfter, dialogNoSpaceAfter, dialogIllegalSign, obliqueBar, apostropheWithSpace, apostropheMultiple, quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper, spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph);
 // detect pain spots
 function spots(txt, rx) {
     //TODO handle null cases

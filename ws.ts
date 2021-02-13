@@ -8,20 +8,21 @@ const lightprev = document.getElementById('lightprev') as HTMLButtonElement;
 const sel: Selection | null = document.getSelection();
 
 //TODO check the need for min regex //mg
-const commaSpaceBefore: RegExp = /\s+(?=,)/mg;
-const commaNoSpaceAfterNoDigit: RegExp = /,(?=[^\s\n\d])|(?<=[^\d]),(?=\d)/mg;
-const commaSpaceBeforeInsideDigit: RegExp = /(?<=\d)\s+,(?=\d)/mg;
+const commaSpaceBefore: RegExp = /\s+(?=,)/g;
+const commaNoSpaceAfterNoDigit: RegExp = /,(?=[^\s\n\d])|(?<=[^\d]),(?=\d)/g;
+const commaSpaceBeforeInsideDigit: RegExp = /(?<=\d)\s+,(?=\d)/g;
 
-const paranthesisWithSpace: RegExp = /[\(\[]\s+|\s+[\)\]]/mg;
+const paranthesisSpaceInternal: RegExp = /[\(\[]\s+|\s+[\)\]]/g;
+const paranthesisSpaceExternal: RegExp = /(?<=\S)[\(\[]|[\)\]](?=[a-zA-Z0-9îÎăĂâÂșȘțȚ])/g;
 
-const exclamationQuestionWithSpaces: RegExp = /\s+[\?\!]/mg;
-const exclamationQuestionMoreThanTwo: RegExp = /[\?\!]{3,}/mg;
+const exclamationQuestionWithSpaces: RegExp = /\s+[\?\!]/g;
+const exclamationQuestionMoreThanTwo: RegExp = /[\?\!]{3,}/g;
 
-const pointSeparated: RegExp = /\s+\./mg;
+const pointSeparated: RegExp = /\s+\./g;
 const pointWithLetter: RegExp = /\.[a-zA-ZîÎăĂâÂșȘțȚ]/g;
 const pointSpacedAtEnd: RegExp = /\.\s+\n/mg;
 const pointDecimalMustBeComma: RegExp = /(?<=\d)\.(?=\d)/g;
-const pointDecimalSpacedInsideDigit: RegExp = /(?<=\d)\s+\.(?=\d)|(?<=\d)\.\s+(?=\d)|(?<=\d)\s+\.\s+(?=\d)/mg;
+const pointDecimalSpacedInsideDigit: RegExp = /(?<=\d)\s+\.(?=\d)|(?<=\d)\.\s+(?=\d)|(?<=\d)\s+\.\s+(?=\d)/g;
 
 const twopointsSpacedBefore: RegExp = /\s+\:/g;
 const twopointsSpacedAfter: RegExp = /\:\s{2,}|\:\s+$/g;
@@ -33,20 +34,23 @@ const suspensionNumber: RegExp = /(?<!\.)\.{2}(?!\.)|\.{4,}/g;
 const suspensionSpaceInside: RegExp = /(?<=\.)\s+(?=\.)/g;
 const suspensionSpaceAfter: RegExp =/(?<=[^\s]|^)(?<=\.{3})(\s+$|\s{2,}(?=[^$]))/g;
 
+// here, multiline flag is needed
 const dialogSpaceBefore: RegExp = /^\s+(?=[\u002d\u2010\u2011\u2012\u2013\u2014\u2015])/mg;
 const dialogSpaceAfter: RegExp = /(?<=^\s*[\u002d\u2010\u2011\u2012\u2013\u2014\u2015])\s{2,}/mg;
 const dialogNoSpaceAfter: RegExp = /(?<=^\s*)[\u002d\u2010\u2011\u2012\u2013\u2014\u2015](?=\S)/mg;
 const dialogIllegalSign: RegExp = /(?<=^\s*)[\u002d\u2010\u2011\u2012\u2013\u2014]/mg;
 
+const obliqueBar: RegExp = /\s+\/|\/\s+/g;
+
 const apostropheWithSpace: RegExp = /\s+\'\s+|\s+\'|\'\s+/g;
 const apostropheMultiple: RegExp = /\'{2,}/g;
 
-const quotationMarkStraight: RegExp = /"/mg;
+const quotationMarkStraight: RegExp = /"/g;
 const quotationMarkSimulated: RegExp = /,{2,}/g;
-const quotationMarkBeginUpper: RegExp = /\u201C(?=[^\u201D]+\u201D)/mg;
+const quotationMarkBeginUpper: RegExp = /\u201C(?=[^\u201D]+\u201D)/g;
 
 const spaceStartParagraph: RegExp = /^\s+/mg;
-const spaceEndParagraph: RegExp = /\s+$/mg;
+const spaceEndParagraph: RegExp = /(?<!\n)\s+$/mg;
 const spaceMultiple: RegExp = /[^\S\r\n]{2,}/g;
 const emptyParagraph: RegExp = /^\n/mg;
 
@@ -54,12 +58,13 @@ const rx: Array<RegExp> = [];
 // order matters, it mirrors those existent on html source
 rx.push(
 	commaSpaceBefore, commaNoSpaceAfterNoDigit, commaSpaceBeforeInsideDigit,
-	paranthesisWithSpace,
+	paranthesisSpaceInternal, paranthesisSpaceExternal,
 	exclamationQuestionWithSpaces, exclamationQuestionMoreThanTwo,
 	pointSeparated, pointWithLetter, pointSpacedAtEnd, pointDecimalMustBeComma,pointDecimalSpacedInsideDigit,
 	twopointsSpacedBefore, twopointsSpacedAfter, twopointsNoSpace,
 	suspensionSpaceBefore, suspensionSpaceAfterMissing, suspensionNumber, suspensionSpaceInside, suspensionSpaceAfter,
     dialogSpaceBefore, dialogSpaceAfter, dialogNoSpaceAfter, dialogIllegalSign,
+		obliqueBar,
 	apostropheWithSpace, apostropheMultiple,
 	quotationMarkStraight, quotationMarkSimulated, quotationMarkBeginUpper,
 	spaceStartParagraph, spaceEndParagraph, spaceMultiple, emptyParagraph,
