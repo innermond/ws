@@ -75,7 +75,7 @@ function spots(txt: string | null, rx: RegExp): Array<RegExpExecArray> {
     if (txt === null) return [];
     if (sel === null) return [];
 
-    sel.removeAllRanges();
+    //sel.removeAllRanges();
 
     const ff: Array<RegExpExecArray> = [];
     ff.push(...mistakes(rx, txt).filter(x => x.length));
@@ -115,13 +115,31 @@ const make_mistakes_one_by_one = (ff: Array<RegExpExecArray>) => {
     },
 })};
 
+function showerr() {
+		let numerr = mistakes_one_by_one.len();
+		const curr = mistakes_one_by_one.curr + 1;
+		switch (numerr) {
+			case 0:
+			numerr = '<strong>arată bine</strong>—alege acum altă verificare';
+			break;
+			case 1:
+			numerr = '<strong>o atenționare</strong>'; 
+			break;
+			default:
+			numerr = `<strong>${numerr} atenționări</strong>`;
+			if (curr > 0) {
+				numerr +=  ` -  te afli la <strong>#${curr}</strong>`;
+			} 
+		}
+    info.innerHTML = numerr;
+}
+
 function scrollhighlight(dir='next') {
     if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0) return;
-
     const found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
+		showerr();
     if (found === undefined) return;
     if (hairy === null) return;
-    info.textContent = `${mistakes_one_by_one.len()} erori - te afli la #${mistakes_one_by_one.curr + 1}`;
     hairy.focus();
     sel?.removeAllRanges();
     hairy.scrollTop = 0;
@@ -132,20 +150,18 @@ function scrollhighlight(dir='next') {
     const scrollTop = hairy.scrollHeight;
     hairy.scrollTop = scrollTop;
     hairy.value = fulltext;
-
     hairy.setSelectionRange(found.index, indexend);
 }
 
-function runtext(): number {
+function runtext(clearRanges:boolean = true): number {
     const sel = document.getSelection();
     if (sel === null) return 0;
-    sel.removeAllRanges();
+    if (clearRanges) sel.removeAllRanges();
     const rx_key: number = parseInt(rules.value) ?? -1;
     if (rx_key === -1) return 0;
     if (!(rx_key in rx)) return 0;
     make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
     const num: number = mistakes_one_by_one.len();
-    info.textContent = `s-au găsit ${num} erori`;
     return num;
 } 
 
@@ -162,12 +178,17 @@ function usable (mode: boolean = true, inx: number = -1) {
 rules.addEventListener('change', (evt) => {
     evt.preventDefault();
     usable(false);
-    if (rules.value === '-1') return;
+		if (rules.value === '-1') {
+			info.textContent = '';
+			return;
+		}
     const found = runtext();
     if (found > 0) {
-        usable(true);
-        lightnext.click();
-    } 
+			usable(true);
+			lightnext.click();
+		} else {
+			showerr();
+		} 
 });
 
 lightnext.addEventListener('click', (evt) => {
@@ -181,11 +202,13 @@ lightprev.addEventListener('click', (evt) => {
 });
 
 hairy.spellcheck = false;
-hairy.addEventListener('change', () => {
+hairy.addEventListener('keyup', (evt) => {
+		if (evt.target !== hairy) return;
     if (rules.value === '-1') return;
     usable(false);
-    const found = runtext();
+    const found = runtext(false);
     if (found > 0) usable(true); 
+		showerr();
 });
 
 usable(false);

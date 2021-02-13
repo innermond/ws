@@ -51,7 +51,7 @@ function spots(txt, rx) {
         return [];
     if (sel === null)
         return [];
-    sel.removeAllRanges();
+    //sel.removeAllRanges();
     var ff = [];
     ff.push.apply(ff, mistakes(rx, txt).filter(function (x) { return x.length; }));
     return ff;
@@ -89,16 +89,34 @@ var make_mistakes_one_by_one = function (ff) {
         }
     });
 };
+function showerr() {
+    var numerr = mistakes_one_by_one.len();
+    var curr = mistakes_one_by_one.curr + 1;
+    switch (numerr) {
+        case 0:
+            numerr = '<strong>arată bine</strong>—alege acum altă verificare';
+            break;
+        case 1:
+            numerr = '<strong>o atenționare</strong>';
+            break;
+        default:
+            numerr = "<strong>" + numerr + " aten\u021Bion\u0103ri</strong>";
+            if (curr > 0) {
+                numerr += " -  te afli la <strong>#" + curr + "</strong>";
+            }
+    }
+    info.innerHTML = numerr;
+}
 function scrollhighlight(dir) {
     if (dir === void 0) { dir = 'next'; }
     if (!mistakes_one_by_one || mistakes_one_by_one.len() === 0)
         return;
     var found = dir === 'next' ? mistakes_one_by_one.next() : mistakes_one_by_one.prev();
+    showerr();
     if (found === undefined)
         return;
     if (hairy === null)
         return;
-    info.textContent = mistakes_one_by_one.len() + " erori - te afli la #" + (mistakes_one_by_one.curr + 1);
     hairy.focus();
     sel === null || sel === void 0 ? void 0 : sel.removeAllRanges();
     hairy.scrollTop = 0;
@@ -111,12 +129,14 @@ function scrollhighlight(dir) {
     hairy.value = fulltext;
     hairy.setSelectionRange(found.index, indexend);
 }
-function runtext() {
+function runtext(clearRanges) {
     var _a;
+    if (clearRanges === void 0) { clearRanges = true; }
     var sel = document.getSelection();
     if (sel === null)
         return 0;
-    sel.removeAllRanges();
+    if (clearRanges)
+        sel.removeAllRanges();
     var rx_key = (_a = parseInt(rules.value)) !== null && _a !== void 0 ? _a : -1;
     if (rx_key === -1)
         return 0;
@@ -124,7 +144,6 @@ function runtext() {
         return 0;
     make_mistakes_one_by_one(spots(hairy.value, rx[rx_key]));
     var num = mistakes_one_by_one.len();
-    info.textContent = "s-au g\u0103sit " + num + " erori";
     return num;
 }
 function usable(mode, inx) {
@@ -141,12 +160,17 @@ function usable(mode, inx) {
 rules.addEventListener('change', function (evt) {
     evt.preventDefault();
     usable(false);
-    if (rules.value === '-1')
+    if (rules.value === '-1') {
+        info.textContent = '';
         return;
+    }
     var found = runtext();
     if (found > 0) {
         usable(true);
         lightnext.click();
+    }
+    else {
+        showerr();
     }
 });
 lightnext.addEventListener('click', function (evt) {
@@ -158,12 +182,15 @@ lightprev.addEventListener('click', function (evt) {
     scrollhighlight('prev');
 });
 hairy.spellcheck = false;
-hairy.addEventListener('change', function () {
+hairy.addEventListener('keyup', function (evt) {
+    if (evt.target !== hairy)
+        return;
     if (rules.value === '-1')
         return;
     usable(false);
-    var found = runtext();
+    var found = runtext(false);
     if (found > 0)
         usable(true);
+    showerr();
 });
 usable(false);

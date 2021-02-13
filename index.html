@@ -7,6 +7,7 @@
 .rules-checker textarea{overflow-x: hidden; padding: 1rem; box-sizing: border-box; height: 10rem;}
 .rules-checker select {box-sizing: border-box; overflow: hidden; flex: 1 1 100%;}
 .rules-checker select+div {display: flex; flex-flow: row wrap; justify-content: center; padding: 1rem;}
+#info strong {font-size: 1.2rem;}
 </style>
   </head>
   <body>
@@ -80,22 +81,5 @@
         </div>
     </div>
     <script src="./ws.js"></script>
-<noscript id="deferred-styles">
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:300,700">
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-</noscript>
-<script>
-  var loadDeferredStyles = function() {
-    var addStylesNode = document.getElementById("deferred-styles");
-    var replacement = document.createElement("div");
-    replacement.innerHTML = addStylesNode.textContent;
-    document.body.appendChild(replacement)
-    addStylesNode.parentElement.removeChild(addStylesNode);
-  };
-  var raf = requestAnimationFrame || mozRequestAnimationFrame ||
-  webkitRequestAnimationFrame || msRequestAnimationFrame;
-  if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
-  else window.addEventListener('DOMContentLoaded', loadDeferredStyles);
-</script>
   </body>
 </html>
