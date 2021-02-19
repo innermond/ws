@@ -1,0 +1,73 @@
+interface DtpTime {
+	days: number,
+	hours: number,
+}
+
+function dh(d: number): DtpTime {
+	let hours: number = d%24;
+	let days: number = (d - hours)/24;
+	days += Math.floor(hours/8);
+	hours = hours%8;
+
+	return {days, hours};
+}
+
+interface Quotation {
+	time: DtpTime,
+	price: number,
+}
+
+// scale val between intervals
+function scale(v: number, in_min: number, in_max: number, out_min: number, out_max: number): number {
+	console.log(v)
+	// assume in_min < in_max
+	if (v <= in_min) v = in_min;
+	console.log(v)
+  let out = (v - in_min) * Math.abs((out_max - out_min) / (in_max - in_min)) + Math.min(out_min, out_max);
+	console.log(out, out_min, out_max);
+	const is_reversed = out_max < out_min;
+	if (is_reversed) out = Math.max(out_min, out_max) - out; 
+	console.log(out);
+	return out;
+}
+
+function quota(num: number, peak: number, span: number, hours: number, price: number, tr:[number, number, number, number]): Quotation {
+	const ratio: number = peak/num;
+	const atenuation = scale(ratio, ...tr);
+	price = (num/span)*price*atenuation;
+	const d: number = Math.ceil((hours/ratio*atenuation));
+	
+	const time: DtpTime = dh(d);
+	return {time, price};
+}
+
+function txt(num: number): Quotation {
+	return quota(num, 45000, 300, 7*24, 0.65, [0, 1, 0.75, 1]);
+}
+
+function img(num: number): Quotation {
+	return quota(num, 10, 5, 2, 5, [0, 1, 2, 1]);
+}
+
+function lst(num: number): Quotation {
+	return quota(num, 10, 5, 2, 5, [0, 1, 3, 1]);
+}
+
+function tbls(num: number): Quotation {
+	return quota(num, 4, 2, 2, 4, [0, 1, 4, 1]);
+}
+
+interface QuotationFunc {
+	(num: number): Quotation;
+}
+function testprice(vv:number[], fnfn: QuotationFunc[]): void {
+	vv.forEach(v => {
+		fnfn.forEach(fn => {
+			const q: Quotation = fn(v);
+			console.log('words: ', v, 'quotation: ', q);
+		})
+	})
+}
+
+//testprice([30000, 45000, 70000,  80000, 90000, 120000], [txt]);
+testprice([1], [img]);
