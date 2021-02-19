@@ -32,16 +32,28 @@ function scale(v, in_min, in_max, out_min, out_max) {
     var out = (v - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     return out;
 }
+var ErrQuotation;
+(function (ErrQuotation) {
+    ErrQuotation[ErrQuotation["NotPositive"] = 1] = "NotPositive";
+    ErrQuotation[ErrQuotation["NotInteger"] = 2] = "NotInteger";
+})(ErrQuotation || (ErrQuotation = {}));
+function is_err(err) {
+    return err.length > 0;
+}
 function quota(num, peak, span, hours, price, tr) {
-    // only positives
+    var errs = [];
     if (num <= 0)
-        return new Error('only positive numbers');
+        errs.push(ErrQuotation.NotPositive);
+    if (Math.floor(num) != num)
+        errs.push(ErrQuotation.NotInteger);
+    if (errs.length)
+        return errs;
     var ratio = peak / num;
     var atenuation = scale.apply(void 0, __spreadArrays([ratio], tr));
     price = (num / span) * price * atenuation;
     var d = Math.ceil((hours / ratio * atenuation));
     var time = dh(d);
-    return { time: time, price: price };
+    return { num: num, time: time, price: price };
 }
 function txt(num) {
     return quota(num, 45000, 300, 7 * 8, 0.65, [0, 1, 0.75, 1]);
@@ -56,31 +68,39 @@ function tbl(num) {
     return quota(num, 4, 2, 2, 4, [0, 1, 1, 1]);
 }
 function price(txt_num, img_num, lst_num, tbl_num) {
+    if (txt_num === void 0) { txt_num = 0; }
+    if (img_num === void 0) { img_num = 0; }
+    if (lst_num === void 0) { lst_num = 0; }
+    if (tbl_num === void 0) { tbl_num = 0; }
+    var errs = new Map();
+    var text = txt(txt_num);
+    if (is_err(text))
+        errs.set('text', text);
+    var pictures = img(img_num);
+    if (is_err(pictures))
+        errs.set('pictures', pictures);
+    var lists = lst(lst_num);
+    if (is_err(lists))
+        errs.set('lists', lists);
+    var tables = tbl(tbl_num);
+    if (is_err(tables))
+        errs.set('tables', tables);
+    if (errs.size)
+        return errs;
     var qq = {
-        text: {},
-        pictures: {},
-        lists: {},
-        tables: {}
+        text: text,
+        pictures: pictures,
+        lists: lists,
+        tables: tables
     };
-    if (txt_num)
-        qq.text = txt(txt_num);
-    if (img_num)
-        qq.pictures = img(img_num);
-    if (lst_num)
-        qq.lists = lst(lst_num);
-    if (tbl_num)
-        qq.tables = tbl(tbl_num);
     var price = 0.0;
     var time = 0.0;
     var out = {};
     for (var k in qq) {
         var s = k;
         var q = qq[s];
-        var err = q;
-        if (err) {
+        if (is_err(q))
             continue;
-        }
-        ;
         q = q;
         var tm = undh(q.time);
         price += q.price;
@@ -90,11 +110,15 @@ function price(txt_num, img_num, lst_num, tbl_num) {
     ;
     return __assign(__assign({}, out), { price: price, time: dh(time) });
 }
+[[-10, 0, 10, 3], [25000, 10, 5, 10]].forEach(function (pp) {
+    var p = price.apply(void 0, pp);
+    console.log(p);
+});
 function testprice(vv, fnfn) {
     vv.forEach(function (v) {
         fnfn.forEach(function (fn) {
             var q = fn(v);
-            if (q) {
+            if (is_err(q)) {
                 console.log(q);
                 return;
             }
@@ -102,7 +126,7 @@ function testprice(vv, fnfn) {
         });
     });
 }
-testprice([45000, 0, 1, 100, 1000, 5000, 22500, 45000, 90000], [txt]);
+//testprice([45000, 0, 1, 100, 1000, 5000, 22500, 45000, 90000], [txt]);
 //testprice([1, 5, 10, 15, 30], [img]);
 //testprice([1, 5, 10, 15, 30], [lst]);
 //testprice([1, 5, 10, 15, 30], [tbl]);
