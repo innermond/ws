@@ -29,11 +29,13 @@ function undh(dt) {
 }
 // scale val between intervals
 function scale(v, in_min, in_max, out_min, out_max) {
-    // assume in_min < in_max
     var out = (v - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
     return out;
 }
 function quota(num, peak, span, hours, price, tr) {
+    // only positives
+    if (num <= 0)
+        return new Error('only positive numbers');
     var ratio = peak / num;
     var atenuation = scale.apply(void 0, __spreadArrays([ratio], tr));
     price = (num / span) * price * atenuation;
@@ -70,25 +72,37 @@ function price(txt_num, img_num, lst_num, tbl_num) {
         qq.tables = tbl(tbl_num);
     var price = 0.0;
     var time = 0.0;
+    var out = {};
     for (var k in qq) {
-        var q = qq[k];
+        var s = k;
+        var q = qq[s];
+        var err = q;
+        if (err) {
+            continue;
+        }
+        ;
+        q = q;
         var tm = undh(q.time);
         price += q.price;
         time += tm;
+        out[s] = q;
     }
     ;
-    return __assign(__assign({}, qq), { price: price, time: dh(time) });
+    return __assign(__assign({}, out), { price: price, time: dh(time) });
 }
-[[30000, 20, 10, 3], [45000, 5, 5, 20]].forEach(function (pp) { return console.log(price.apply(void 0, pp)); });
 function testprice(vv, fnfn) {
     vv.forEach(function (v) {
         fnfn.forEach(function (fn) {
             var q = fn(v);
+            if (q) {
+                console.log(q);
+                return;
+            }
             console.log('words: ', v, 'quotation: ', q);
         });
     });
 }
-//testprice([1, 5000, 30000, 45000, 70000,  80000, 90000, 120000], [txt]);
+testprice([45000, 0, 1, 100, 1000, 5000, 22500, 45000, 90000], [txt]);
 //testprice([1, 5, 10, 15, 30], [img]);
 //testprice([1, 5, 10, 15, 30], [lst]);
 //testprice([1, 5, 10, 15, 30], [tbl]);
