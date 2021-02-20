@@ -6,6 +6,7 @@
         ],
         "strict": true,
         "target": "es2015",
-				"sourceMap": true
+				"sourceMap": true,
+				"esModuleInterop": true
     }
 }

@@ -1,3 +1,4 @@
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -16,6 +17,8 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
+exports.__esModule = true;
+exports.quota = exports.ErrQuotation = void 0;
 function dh(d) {
     var hours = d % 8;
     var days = (d - hours) / 8;
@@ -29,18 +32,23 @@ function undh(dt) {
 }
 // scale val between intervals
 function scale(v, in_min, in_max, out_min, out_max) {
-    var out = (v - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+    var out = ((v - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
     return out;
 }
 var ErrQuotation;
 (function (ErrQuotation) {
     ErrQuotation[ErrQuotation["NotPositive"] = 1] = "NotPositive";
     ErrQuotation[ErrQuotation["NotInteger"] = 2] = "NotInteger";
-})(ErrQuotation || (ErrQuotation = {}));
+})(ErrQuotation = exports.ErrQuotation || (exports.ErrQuotation = {}));
 function is_err(err) {
     return err.length > 0;
 }
-function quota(num, peak, span, hours, price, tr) {
+function quota() {
+    var _a = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        _a[_i] = arguments[_i];
+    }
+    var num = _a[0], peak = _a[1], span = _a[2], hours = _a[3], price = _a[4], tr = _a[5];
     var errs = [];
     if (num <= 0)
         errs.push(ErrQuotation.NotPositive);
@@ -51,10 +59,11 @@ function quota(num, peak, span, hours, price, tr) {
     var ratio = peak / num;
     var atenuation = scale.apply(void 0, __spreadArrays([ratio], tr));
     price = (num / span) * price * atenuation;
-    var d = Math.ceil((hours / ratio * atenuation));
+    var d = Math.ceil((hours / ratio) * atenuation);
     var time = dh(d);
     return { num: num, time: time, price: price };
 }
+exports.quota = quota;
 function txt(num) {
     return quota(num, 45000, 300, 7 * 8, 0.65, [0, 1, 0.75, 1]);
 }
@@ -107,25 +116,28 @@ function price(txt_num, img_num, lst_num, tbl_num) {
         time += tm;
         out[s] = q;
     }
-    ;
     return __assign(__assign({}, out), { price: price, time: dh(time) });
 }
-[[-10, 0, 10, 3], [25000, 10, 5, 10]].forEach(function (pp) {
-    var p = price.apply(void 0, pp);
+/*[[-10, 0, 10, 3], [25000, 10, 5, 10]].forEach((pp) => {
+    const p = price(...pp);
     console.log(p);
 });
-function testprice(vv, fnfn) {
-    vv.forEach(function (v) {
-        fnfn.forEach(function (fn) {
-            var q = fn(v);
+
+interface QuotationFunc {
+    (num: number): TryQuotation;
+}
+function testprice(vv:number[], fnfn: QuotationFunc[]): void {
+    vv.forEach(v => {
+        fnfn.forEach(fn => {
+            const q: TryQuotation = fn(v);
             if (is_err(q)) {
                 console.log(q);
                 return;
             }
             console.log('words: ', v, 'quotation: ', q);
-        });
-    });
-}
+        })
+    })
+}*/
 //testprice([45000, 0, 1, 100, 1000, 5000, 22500, 45000, 90000], [txt]);
 //testprice([1, 5, 10, 15, 30], [img]);
 //testprice([1, 5, 10, 15, 30], [lst]);
