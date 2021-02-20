@@ -66,8 +66,8 @@ function quota(
   //  TryQuotation as it's ErrQuotation[] side
   if (errs.length) return errs;
 
-  // zero case
-  if (num === 0) return { num: 0, time: dh(0), price: 0 };
+	// zero case
+	if (num === 0) return {num: 0, time: dh(0), price: 0};
 
   // happy path onward
   const ratio: number = peak / num;
@@ -100,22 +100,13 @@ function tbl(num: number): TryQuotation {
   return quota(num, 4, 2, 2, 4, [0, 1, 1, 1]);
 }
 
-//type Section = 'text',  'pictures' | 'lists' | 'tables';
-const sections = ['text', 'pictures', 'lists', 'tables'] as const;
-type Section = typeof sections[number];
-function is_section(k: string): k is Section {
-	return sections.includes(k as Section);
-}
+type Section = 'text' | 'pictures' | 'lists' | 'tables';
 type QuotationSummary = Record<Section, Quotation> & {
   price: number;
   time: WorkTime;
 };
 type ErrQuotationSummary = Map<Section, ErrQuotation[]>;
 type PriceResult = QuotationSummary | ErrQuotationSummary;
-function is_quotation_summary(r: PriceResult): r is QuotationSummary {
-  const q = r as QuotationSummary;
-  return q.price !== undefined && q.time !== undefined;
-}
 
 // it gives a PriceResult either a ErrQuotationSummary
 // or a complete QuotationSummary
@@ -175,23 +166,24 @@ const $lst = <HTMLInputElement>document.getElementById('price-lst');
 const $tbl = <HTMLInputElement>document.getElementById('price-tbl');
 [$txt, $img, $lst, $tbl].forEach(($input) => {
   $input.addEventListener('input', () => {
-    let result = price(
+    const result = price(
       parseFloat($txt.value),
       parseFloat($img.value),
       parseFloat($lst.value),
       parseFloat($tbl.value)
     );
-    // ok branch
-    if (is_quotation_summary(result)) {
-      //result = (result as QuotationSummary);
-      for (let k in result) {
-        if (!is_section(k)) continue;
-				console.log(result[k]);
-      }
-    } else {
-      // error happened
-    }
-    console.log(result);
+		// ok branch
+		if ('price' in result && 'time' in result) {
+			const ss: Section[] = Object.keys(result);
+			for (let s of ss) {
+				console.log(s);
+			}
+		} else { // error happened
+
+		}
+    console.log(
+      result
+    );
   });
 });
 

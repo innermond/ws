@@ -5,8 +5,9 @@
             "dom"
         ],
         "strict": true,
-        "target": "es2015",
-				"sourceMap": true,
-				"esModuleInterop": true
+        "target": "es5",
+				"noImplicitAny": true,
+        "removeComments": true,	
+				"sourceMap": true
     }
 }
