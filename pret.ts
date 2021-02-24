@@ -1,3 +1,5 @@
+type Currency = 'EUR|USD|RON';
+
 interface WorkTime {
   days: number; // 8 hour = 1 day
   hours: number;
@@ -169,32 +171,49 @@ function price(
 }
 
 // UI
+const twin_summary: Map<string, string> = new Map([
+	['price-txt', 'text'],
+	['price-img', 'pictures'],
+	['price-lst', 'lists'],
+	['price-tbl', 'tables'],
+]);
+
+const CURRENCY = 'EUR' as Currency;
 const $txt = <HTMLInputElement>document.getElementById('price-txt');
 const $img = <HTMLInputElement>document.getElementById('price-img');
 const $lst = <HTMLInputElement>document.getElementById('price-lst');
 const $tbl = <HTMLInputElement>document.getElementById('price-tbl');
+const $total = <HTMLInputElement>document.getElementById('price-total');
+const $time = <HTMLInputElement>document.getElementById('time-total');
 [$txt, $img, $lst, $tbl].forEach(($input) => {
-  $input.addEventListener('input', () => {
-    let result = price(
-      parseFloat($txt.value),
-      parseFloat($img.value),
-      parseFloat($lst.value),
-      parseFloat($tbl.value)
-    );
-    // ok branch
-    if (is_quotation_summary(result)) {
-      //result = (result as QuotationSummary);
-      for (let k in result) {
-        if (!is_section(k)) continue;
-				console.log(result[k]);
-      }
-    } else {
-      // error happened
-    }
-    console.log(result);
-  });
+  $input.addEventListener('input', price_calculate);
 });
 
+function  price_calculate() {
+	let result = price(
+		parseFloat($txt.value),
+		parseFloat($img.value),
+		parseFloat($lst.value),
+		parseFloat($tbl.value)
+	);
+	// ok branch
+	if (!is_quotation_summary(result)) return;
+	const $twins: NodeListOf<HTMLElement> = document.querySelectorAll('p[data-twin]');
+	$twins.forEach($twin => {
+		const twin: string|undefined = $twin.dataset?.twin;
+		if (typeof twin === 'undefined') return;
+		if(!twin_summary.has(twin)) return;
+		let s:string = twin_summary.get(twin) as string;
+		if (!is_section(s)) return;
+		const ss = (result as QuotationSummary)[(s as Section)];
+		$twin.innerHTML = `preț ${ss.price.toFixed(2)} ${CURRENCY}/timp: ${ss.time.days} zile ${ss.time.hours} ore`;
+	});
+	// total
+	$total.innerHTML = `${result.price.toFixed(2)} ${CURRENCY}`;
+	$time.innerHTML = `${result.time.days} zile ${result.time.hours} ore`;
+
+}
+price_calculate();
 /*[[-10, 0, 10, 3], [25000, 10, 5, 10]].forEach((pp) => {
     const p = price(...pp);
     console.log(p);
