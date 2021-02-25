@@ -1,11 +1,19 @@
 {
     "compilerOptions": {
         "lib": [
-            "es2015",
+            "es5",
+            "es6",
+            "es2018",
             "dom"
         ],
         "strict": true,
-        "target": "es2015",
-				"sourceMap": true
+        "target": "es6",
+        "sourceMap": true,
+        "module": "es2015",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "importHelpers": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
     }
 }
