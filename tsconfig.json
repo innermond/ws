@@ -7,9 +7,14 @@
             "dom"
         ],
         "strict": true,
-        "target": "es5",
+        "target": "es3",
+        "downlevelIteration": true,
         "noImplicitAny": true,
         "removeComments": true,	
-        "sourceMap": true
-    }
+        "sourceMap": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true
+    },
+    "files": ["pret.ts"],
+    "exclude": ["test_*.ts", "node_modules", "**/*.spec.ts"]
 }
