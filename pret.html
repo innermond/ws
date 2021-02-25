@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Calculează prețul tehnoredactării</title>
+<style>
+</style>
+  </head>
+  <body>
+<h2>Preț tehnoredactare</h2>
+<p>Pentru a afla <strong>costul de tehnoredactare</strong> introduceți estimativ numărul de cuvinte al manuscrisului, numărul imaginilor, listelor și/sau tabelelor pe care le-ar putea conține lucrarea.</p>
+    <div class="dtp-wrapper">
+			<div>
+				<h3>Cuvinte</h3>
+				<p data-twin="price-txt"></p>
+				<input id="price-txt" type="number" min="0" step="1000" value="45000">
+			</div>
+			<div>
+				<h3>Imagini</h3>
+				<p data-twin="price-img"></p>
+				<input id="price-img" type="number" min="0" step="1" value="0">
+			</div>
+			<div>
+				<h3>Liste</h3>
+				<p data-twin="price-lst"></p>
+				<input id="price-lst" type="number" min="0" step="1" value="0">
+			</div>
+			<div>
+				<h3>Tabele</h3>
+				<p data-twin="price-tbl"></p>
+				<input id="price-tbl" type="number" min="0" step="1" value="0">
+			</div>
+			<div>
+				<h3>Total</h3>
+				<p id="price-total"></p>
+				<p id="time-total"></p>
+			</div>
+    </div>
+    <script src="./pret.js"></script>
+  </body>
+</html>

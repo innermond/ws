@@ -7,13 +7,9 @@
             "dom"
         ],
         "strict": true,
-        "target": "es6",
-        "sourceMap": true,
-        "module": "es2015",
-        "esModuleInterop": true,
-        "resolveJsonModule": true,
-        "importHelpers": true,
-        "emitDecoratorMetadata": true,
-        "experimentalDecorators": true
+        "target": "es5",
+        "noImplicitAny": true,
+        "removeComments": true,	
+        "sourceMap": true
     }
 }
